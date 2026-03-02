@@ -30,6 +30,9 @@
         placeholder="Password"
         required
       />
+      <p id="login-error" class="text-red-400 text-sm mb-4 hidden">
+        Invalid name or password. Please try again.
+      </p>
       <button
         class="p-4 bg-olive-800 font rounded-2xl my-5 text-xl hover:bg-olive-700 hover:shadow-2xl cursor-pointer"
         type="submit"
@@ -73,9 +76,7 @@
         placeholder="Confirm Password"
         required
       />
-      <p id="login-error" class="text-red-400 text-sm mb-4 hidden">
-        Invalid email or password. Please try again.
-      </p>
+      <p id="signup-error" class="text-red-400 text-sm mb-4 hidden"></p>
 
       <button
         class="p-4 bg-olive-800 font rounded-2xl my-5 text-xl hover:bg-olive-700 hover:shadow-2xl cursor-pointer transition-all duration-200"
@@ -89,6 +90,6 @@
         <a class="text-amber-500" href="#" id="show-login">Login</a>
       </p>
     </form>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/auth.js"></script>
   </body>
 </html>
