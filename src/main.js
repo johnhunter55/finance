@@ -1,4 +1,4 @@
-import { pb } from "./auth.js";
+import { pb, handleLogout } from "./auth.js";
 
 if (!pb.authStore.isValid) {
   window.location.href = "/index.html";
@@ -20,6 +20,7 @@ if (logoutBtn) {
     handleLogout();
   });
 }
+
 // const data = {
 //   type: "expense",
 //   category: "Food",
