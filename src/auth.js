@@ -20,13 +20,15 @@ export async function handleSignup(name, password, passwordConfirm) {
 }
 
 export async function handleLogin(name, password) {
+  const loginError = document.getElementById("login-error");
+  if (loginError) loginError.style.display = "none";
+
   try {
     const authData = await pb
       .collection("users")
       .authWithPassword(name, password);
     window.location.href = "/transactions.html";
   } catch (error) {
-    const loginError = document.getElementById("login-error");
     if (loginError) loginError.style.display = "block";
   }
 }
