@@ -6,7 +6,7 @@ if (
   (window.location.pathname === "/" ||
     window.location.pathname === "/index.html")
 ) {
-  window.location.href = "/transactions.html";
+  window.location.href = "/dashboard.html";
 }
 
 const loginForm = document.getElementById("login-form");
@@ -88,7 +88,7 @@ async function handleLogin(name, password) {
       .collection("users")
       .authWithPassword(dummyEmail, password);
 
-    window.location.href = "/transactions.html";
+    window.location.href = "/dashboard.html";
   } catch (error) {
     if (loginError) loginError.style.display = "block";
   }

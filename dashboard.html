@@ -19,9 +19,9 @@
     </div>
     <div class="p-3 flex gap-2">
       <a
-        href="dashboard.html"
+        href="transactions.html"
         class="bg-olive-800 p-2 px-6 rounded-2xl text-lg hover:bg-olive-700/50 hover:shadow-lg cursor-pointer transition-all duration-200"
-        >Dashboard</a
+        >Transactions</a
       >
       <a
         href="history.html"
@@ -29,20 +29,27 @@
         >History</a
       >
     </div>
-    <div>
-      <form id="finance-form">
-        <select id="type">
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
-        </select>
-
-        <input type="text" id="category" placeholder="Category (e.g. Food)" />
-        <input type="number" id="amount" step="0.01" placeholder="0.00" />
-        <input type="datetime-local" id="date" />
-        <textarea id="notes" placeholder="Notes..."></textarea>
-
-        <button type="submit">Save Transaction</button>
-      </form>
+    <div class="flex justify-center items-center w-full h-130">
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div
+          class="shadow-2xl bg-olive-600 p-12 px-20 flex flex-col justify-evenly items-center rounded-2xl"
+        >
+          <h1 class="text-xl font-bold">Income</h1>
+          <h2 id="income">$0</h2>
+        </div>
+        <div
+          class="shadow-2xl bg-olive-600 p-12 px-20 flex flex-col justify-evenly items-center rounded-2xl"
+        >
+          <h1 class="text-xl font-bold">Expense</h1>
+          <h2 id="expenses">$0</h2>
+        </div>
+        <div
+          class="shadow-2xl bg-olive-600 p-12 px-20 flex flex-col justify-evenly items-center rounded-2xl"
+        >
+          <h1 class="text-xl font-bold">Balance</h1>
+          <h2 id="balance">$0</h2>
+        </div>
+      </div>
     </div>
     <script type="module" src="/src/main.js"></script>
   </body>

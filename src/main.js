@@ -1,16 +1,16 @@
 import { pb, handleLogout } from "./auth.js";
+import { getTotalIncome, getTotalExpense } from "./calc.js";
 
 if (!pb.authStore.isValid) {
   window.location.href = "/index.html";
 }
 
-const currentUser = pb.authStore.model;
-console.log("Logged in as:", currentUser.name);
+const currentUser = pb.authStore.record;
 
 document.getElementById("welcome-text").textContent =
   currentUser.name.charAt(0).toUpperCase() +
   currentUser.name.slice(1) +
-  "'s transactions";
+  "'s dashboard";
 
 const logoutBtn = document.getElementById("logout-btn");
 
@@ -21,10 +21,11 @@ if (logoutBtn) {
   });
 }
 
-// const data = {
-//   type: "expense",
-//   category: "Food",
-//   amount: 15.5,
-//   date: "2026-03-02 10:00:00.000Z",
-//   notes: "Lunch at McDonald's",
-// };
+const income = document.getElementById("income");
+const expenses = document.getElementById("expenses");
+const balance = document.getElementById("balance");
+
+income.textContent = "$ " + (await getTotalIncome());
+expenses.textContent = "$ " + (await getTotalExpense());
+balance.textContent =
+  "$ " + ((await getTotalIncome()) - (await getTotalExpense()));
