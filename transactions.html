@@ -6,8 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="/src/style.css" rel="stylesheet" />
     <title>finance</title>
+    <style>
+      input::-webkit-outer-spin-button,
+      input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+    </style>
   </head>
-  <body class="w-full h-screen bg-olive-900 text-olive-100">
+  <body class="w-full h-screen bg-olive-900 text-olive-100 flex flex-col">
     <div class="flex justify-between items-center bg-olive-950/50">
       <h1 id="welcome-text" class="text-2xl pl-5"></h1>
       <button
@@ -29,21 +36,99 @@
         >History</a
       >
     </div>
-    <div>
-      <form id="finance-form">
-        <select id="type">
-          <option value="expense">Expense</option>
-          <option value="income">Income</option>
-        </select>
+    <div class="flex justify-center items-center w-full flex-1">
+      <form
+        id="finance-form"
+        class="flex sm:mb-40 flex-col w-full max-w-sm bg-olive-700 text-white py-6 p-10 gap-2 sm:rounded-2xl shadow-xl"
+      >
+        <h2 class="flex mb-2 justify-center text-xl font-medium text-olive-50">
+          New Transaction
+        </h2>
 
-        <input type="text" id="category" placeholder="Category (e.g. Food)" />
-        <input type="number" id="amount" step="0.01" placeholder="0.00" />
-        <input type="datetime-local" id="date" />
-        <textarea id="notes" placeholder="Notes..."></textarea>
+        <div class="flex items-center justify-between gap-4">
+          <label
+            for="transaction_type"
+            class="text-base font-semibold text-olive-200"
+            >Type</label
+          >
+          <select
+            id="transaction_type"
+            class="w-50 cursor-pointer px-4 py-2 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all"
+            required
+          >
+            <option value="Expenses">Expenses</option>
+            <option value="Income">Income</option>
+          </select>
+        </div>
 
-        <button type="submit">Save Transaction</button>
+        <div class="flex items-center justify-between gap-4">
+          <label for="category" class="text-base font-semibold text-olive-200"
+            >Category</label
+          >
+          <select
+            id="category"
+            class="w-50 cursor-pointer px-4 py-2 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all"
+            required
+          >
+            <option value="Food">Food</option>
+            <option value="Salary">Salary</option>
+            <option value="Rent">Rent</option>
+            <option value="Utilities">Utilities</option>
+            <option value="Savings">Savings</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-between gap-4">
+          <label for="Amount" class="text-base font-semibold text-olive-200"
+            >Amount</label
+          >
+          <div class="relative">
+            <span
+              class="absolute left-4 top-1/2 -translate-y-1/2 text-olive-300"
+              >$</span
+            >
+            <input
+              type="number"
+              id="Amount"
+              class="w-50 pl-8 pr-4 py-2 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all"
+              placeholder="0.00"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-between gap-4">
+          <label for="date" class="text-base font-semibold text-olive-200"
+            >Date</label
+          >
+          <input
+            type="datetime-local"
+            id="date"
+            class="cursor-text w-55 px-4 py-2 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all scheme-dark"
+            required
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="notes" class="my-2 text-base font-semibold text-olive-200"
+            >Notes</label
+          >
+          <textarea
+            id="notes"
+            rows="3"
+            class="w-full px-4 py-2.5 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all resize-none"
+            placeholder="What was this for?"
+          ></textarea>
+        </div>
+
+        <button
+          type="submit"
+          class="cursor-pointer mt-4 w-full py-3 bg-olive-900 hover:bg-olive-950/80 text-white font-bold rounded-xl transition-colors shadow-md active:scale-95"
+        >
+          Add Entry
+        </button>
       </form>
     </div>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/input.js"></script>
   </body>
 </html>
