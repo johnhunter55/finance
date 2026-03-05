@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
+    "material-symbols": "^0.40.2",
     "pocketbase": "^0.26.8",
     "tailwindcss": "^4.2.1",
     "toastify-js": "^1.12.0"
