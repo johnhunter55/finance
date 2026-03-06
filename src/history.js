@@ -25,7 +25,7 @@ records.forEach((record) => {
   const rowHTML = `
     <div class="row-container bg-olive-900 p-4 py-3 odd:bg-olive-950/20 flex justify-between text-amber-50 border border-transparent hover:border-olive-800 transition-all hover:shadow-2xl relative hover:z-10" data-id="${record.id}">      
       <div class="flex flex-col">
-        <span class="category-text w-fit font-bold border rounded-xl text-xl/normal cursor-pointer hover:text-olive-300">${record.category}</span>
+        <span class="category-text w-fit font-bold text-xl/normal cursor-pointer hover:text-olive-300">${record.category}</span>
         <span class="cursor-pointer date-text text-base/tight text-olive-300/80">${new Date(record.date).toLocaleDateString()}</span>
         ${record.notes ? `<span class="note-text text-sm/tight text-olive-300 mt-1 italic">${record.notes}</span>` : ""}
       </div>
