@@ -1,28 +1,13 @@
 import { pb, handleLogout } from "./auth.js";
 import "material-symbols/outlined.css";
+import { renderHeader } from "./header.js";
 
-if (!pb.authStore.isValid) {
-  window.location.href = "/index.html";
-}
+renderHeader();
 
 const currentUser = pb.authStore.record;
 const records = await pb.collection("userData").getFullList({
   sort: "-created",
 });
-
-document.getElementById("welcome-text").textContent =
-  currentUser.name.charAt(0).toUpperCase() +
-  currentUser.name.slice(1) +
-  "'s history";
-
-const logoutBtn = document.getElementById("logout-btn");
-
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    handleLogout();
-  });
-}
 
 // Grab the single container
 const listContainer = document.getElementById("transaction-list");
@@ -40,9 +25,9 @@ records.forEach((record) => {
   const rowHTML = `
     <div class="row-container bg-olive-900 p-4 py-3 odd:bg-olive-950/20 flex justify-between text-amber-50 border border-transparent hover:border-olive-800 transition-all hover:shadow-2xl relative hover:z-10" data-id="${record.id}">      
       <div class="flex flex-col">
-        <span class="category-text font-bold text-xl/normal cursor-pointer hover:text-olive-300">${record.category}</span>
-        <span class="date-text text-base/tight text-olive-300/80">${new Date(record.date).toLocaleDateString()}</span>
-        ${record.notes ? `<span class=" text-sm/tight text-olive-300 mt-1 italic">${record.notes}</span>` : ""}
+        <span class="category-text w-fit font-bold border rounded-xl text-xl/normal cursor-pointer hover:text-olive-300">${record.category}</span>
+        <span class="cursor-pointer date-text text-base/tight text-olive-300/80">${new Date(record.date).toLocaleDateString()}</span>
+        ${record.notes ? `<span class="note-text text-sm/tight text-olive-300 mt-1 italic">${record.notes}</span>` : ""}
       </div>
       
       <div class="flex flex-col text-right">
@@ -73,17 +58,15 @@ let deleteRow = null;
 document.addEventListener("click", async (e) => {
   const categorySpan = e.target.closest(".category-text");
   const dateSpan = e.target.closest(".date-text");
+  const noteSpan = e.target.closest(".note-text");
 
   if (categorySpan) {
-    // Stop if the dropdown is already open
     if (categorySpan.querySelector("select")) return;
 
-    // Grab the current text and the record ID
     const currentCategory = categorySpan.innerText.trim();
     const row = categorySpan.closest(".row-container");
     const recordId = row.dataset.id;
 
-    // Inject the dropdown. We use a ternary operator (?) to auto-select their current category
     categorySpan.innerHTML = `
       <select class="w-32 cursor-pointer bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all text-amber-50">
         <option value="Food" ${currentCategory === "Food" ? "selected" : ""}>Food</option>
@@ -117,7 +100,6 @@ document.addEventListener("click", async (e) => {
       }
     });
 
-    // CANCEL LOGIC: If they click away without changing anything
     selectDropdown.addEventListener("blur", () => {
       if (categorySpan.querySelector("select")) {
         categorySpan.innerHTML = currentCategory;
@@ -127,6 +109,11 @@ document.addEventListener("click", async (e) => {
 
   if (dateSpan) {
     if (dateSpan.querySelector("input")) return;
+
+    const row = dateSpan.closest(".row-container");
+    const recordId = row.dataset.id;
+    const originalDate = dateSpan.innerText;
+
     dateSpan.innerHTML = `
      <input
        type="datetime-local"
@@ -134,27 +121,28 @@ document.addEventListener("click", async (e) => {
        class="cursor-text w-55 px-1 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all scheme-dark"
        required
      />`;
-    // date: (new Date(document.getElementById("date").value).toISOString(), // UTC format
     const date = dateSpan.querySelector("input");
     date.focus();
 
     date.addEventListener("change", async () => {
-      const newDate = document.getElementById("date").value.toISOString();
+      try {
+        const newDateObj = new Date(date.value);
+        const newDateISO = newDateObj.toISOString();
 
-      // Update HTML immediately so it feels fast
-      dateSpan.innerHTML = newDate;
+        dateSpan.innerHTML = newDateObj.toLocaleDateString();
 
-      // Save to PocketBase if it actually changed
-      if (newDate !== currentCategory) {
-        try {
-          await pb.collection("userData").update(recordId, { date: newDate });
-        } catch (error) {
-          console.error("Failed to update:", error);
-          categorySpan.innerHTML = currentCategory; // Revert if database fails
-        }
+        // Update Database
+        await pb.collection("userData").update(recordId, { date: newDateISO });
+      } catch (error) {
+        console.error("Failed to update:", error);
+        // Revert on failure
+        dateSpan.innerHTML = originalDate;
       }
     });
   }
+
+  //    if (noteSpan) {
+  //     if (noteSpan.querySelector("select")) return;
 
   //delete stuff
   const deleteBtn = e.target.closest(".delete-btn");

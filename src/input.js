@@ -1,16 +1,8 @@
 import { pb, handleLogout } from "./auth.js";
 import Toastify from "toastify-js";
+import { renderHeader } from "./header.js";
 
-document.getElementById("welcome-text").textContent = "Update Records";
-
-const logoutBtn = document.getElementById("logout-btn");
-
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", (e) => {
-    e.preventDefault();
-    handleLogout();
-  });
-}
+renderHeader();
 
 const financeForm = document.getElementById("finance-form");
 
