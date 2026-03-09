@@ -6,34 +6,32 @@ renderHeader();
 
 const currentUser = pb.authStore.record;
 const records = await pb.collection("userData").getFullList({
-  sort: "-created",
+  sort: "-date",
 });
 
 function historyList() {
   const listContainer = document.getElementById("transaction-list");
-  listContainer.innerHTML = ""; // Clear out any old data first
+  listContainer.innerHTML = "";
 
-  // Loop through every single record in the array
   records.forEach((record) => {
-    // Note: We use 'record' (singular) here, not 'records'
     const isIncome = record.transaction_type === "Income";
     const amountColor = isIncome ? "text-green-400" : "text-red-400";
     const amountSign = isIncome ? "+" : "-";
 
     const rowHTML = `
       <div class="row-container bg-olive-900 p-4 py-3 odd:bg-olive-950/20 flex justify-between text-amber-50 border border-transparent hover:border-olive-800 transition-all hover:shadow-2xl relative hover:z-10" data-id="${record.id}">      
-        <div class="flex flex-col">
-          <span class="category-text w-fit font-bold text-xl/normal cursor-pointer hover:text-olive-300">${record.category}</span>
-          <span class="cursor-pointer date-text text-base/tight text-olive-300/80">${new Date(record.date).toLocaleDateString()}</span>
-          ${record.notes ? `<span class="note-text text-sm/tight text-olive-300 mt-1 italic">${record.notes}</span>` : ""}
+        <div class="flex flex-col gap-1">
+          <span class="category-text w-fit font-bold text-xl/normal" data-val="${record.category}">${record.category}</span>
+          <span class="date-text text-base/tight text-olive-300/80" data-val="${record.date.substring(0, 10)}">${new Date(record.date).toLocaleDateString()}</span>
+          <span class="note-text text-sm/tight text-olive-300 italic" data-val="${record.notes || ""}">${record.notes || "No notes"}</span>
         </div>
         
         <div class="flex flex-col text-right">
-          <span class="text-xl font-bold ${amountColor}">
+          <span class="amount-text text-xl font-bold ${amountColor}" data-val="${record.amount}">
             ${amountSign}$${record.amount.toFixed(2)}
           </span>
-          <span class="text-sm text-olive-300">${record.transaction_type}</span>
-          <div>
+          <span class="type-text text-sm text-olive-300 mb-1" data-val="${record.transaction_type}">${record.transaction_type}</span>
+          <div id='buttons'>
             <button class="pt-1 text-right edit-btn text-olive-400 hover:text-white transition-all cursor-pointer">
               <span class="material-symbols-outlined">edit</span>
             </button>
@@ -51,8 +49,167 @@ function historyList() {
 
 historyList();
 
-function editHistory() {
-  const listContainer = document.getElementById("transaction-list");
+function editHistory(button) {
+  const row = button.closest(".row-container");
+
+  const catSpan = row.querySelector(".category-text");
+  const dateSpan = row.querySelector(".date-text");
+  const noteSpan = row.querySelector(".note-text");
+  const amountSpan = row.querySelector(".amount-text");
+  const typeSpan = row.querySelector(".type-text");
+
+  // Prevent double-clicking
+  if (catSpan.querySelector("select")) return;
+
+  // Grab the RAW values from our new data-val attributes
+  const cat = catSpan.dataset.val;
+  const date = dateSpan.dataset.val;
+  const note = noteSpan.dataset.val;
+  const amount = amountSpan.dataset.val;
+  const type = typeSpan.dataset.val;
+
+  // Swap everything into Inputs & Selects!
+  catSpan.innerHTML = `
+    <select class="edit-cat w-32 bg-olive-800 rounded px-1 focus:outline-none focus:ring-2 focus:ring-olive-500">
+      <option value="Food" ${cat === "Food" ? "selected" : ""}>Food</option>
+      <option value="Salary" ${cat === "Salary" ? "selected" : ""}>Salary</option>
+      <option value="Rent" ${cat === "Rent" ? "selected" : ""}>Rent</option>
+      <option value="Utilities" ${cat === "Utilities" ? "selected" : ""}>Utilities</option>
+      <option value="Savings" ${cat === "Savings" ? "selected" : ""}>Savings</option>
+    </select>`;
+
+  dateSpan.innerHTML = `<input type="date" class="edit-date bg-olive-800 rounded px-1 focus:outline-none text-amber-50" value="${date}">`;
+  noteSpan.innerHTML = `<input type="text" class="edit-note bg-olive-800 rounded px-1 w-full focus:outline-none text-amber-50" value="${note}" placeholder="Notes...">`;
+  amountSpan.innerHTML = `<input type="number" step="0.01" class="edit-amount bg-olive-800 rounded px-1 w-24 text-right focus:outline-none text-amber-50" value="${amount}">`;
+
+  typeSpan.innerHTML = `
+    <select class="edit-type bg-olive-800 rounded px-1 focus:outline-none text-right">
+      <option value="Expenses" ${type === "Expenses" ? "selected" : ""}>Expense</option>
+      <option value="Income" ${type === "Income" ? "selected" : ""}>Income</option>
+    </select>`;
+
+  // Change button to Save
+  button.classList.remove("edit-btn");
+  button.classList.add("save-btn");
+  button.innerHTML = `<span class="material-symbols-outlined text-green-400">check_circle</span>`;
+
+  // Inject a Cancel button right next to the Save button
+  button.insertAdjacentHTML(
+    "afterend",
+    `
+    <button class="pt-1 text-right cancel-btn text-red-400 hover:text-red-600 transition-all cursor-pointer">
+      <span class="material-symbols-outlined">cancel</span>
+    </button>
+  `,
+  );
+}
+async function saveHistory(button) {
+  const row = button.closest(".row-container");
+  const recordId = row.dataset.id;
+
+  // 1. Grab the original values from the hidden data-val attributes
+  const catSpan = row.querySelector(".category-text");
+  const dateSpan = row.querySelector(".date-text");
+  const noteSpan = row.querySelector(".note-text");
+  const amountSpan = row.querySelector(".amount-text");
+  const typeSpan = row.querySelector(".type-text");
+
+  const oldCat = catSpan.dataset.val;
+  const oldDate = dateSpan.dataset.val;
+  const oldNote = noteSpan.dataset.val;
+  const oldAmount = parseFloat(amountSpan.dataset.val);
+  const oldType = typeSpan.dataset.val;
+
+  const newCat = row.querySelector(".edit-cat").value;
+  const newDate = row.querySelector(".edit-date").value;
+  const newNote = row.querySelector(".edit-note").value;
+  const newAmount = parseFloat(row.querySelector(".edit-amount").value);
+  const newType = row.querySelector(".edit-type").value;
+
+  const updates = {};
+
+  if (newCat !== oldCat) updates.category = newCat;
+  if (newDate !== oldDate) updates.date = newDate + "T12:00:00.000Z";
+  if (newNote !== oldNote) updates.notes = newNote;
+  if (newAmount !== oldAmount) updates.amount = newAmount;
+  if (newType !== oldType) updates.transaction_type = newType;
+
+  // 4. Check if anything actually changed before talking to the database
+  if (Object.keys(updates).length > 0) {
+    try {
+      // Send ONLY the specific fields inside our 'updates' package
+      await pb.collection("userData").update(recordId, updates);
+    } catch (error) {
+      console.error("Full error:", error);
+
+      // This is the magic line that asks PocketBase exactly what failed!
+      console.error("PocketBase says:", error.response?.data);
+
+      alert(
+        "Save failed! Open your console to see which field PocketBase rejected.",
+      );
+      return;
+    }
+  }
+
+  // 5. Update the UI back to normal text
+  catSpan.dataset.val = newCat;
+  catSpan.innerHTML = newCat;
+
+  dateSpan.dataset.val = newDate;
+  dateSpan.innerHTML = new Date(newDate + "T12:00:00Z").toLocaleDateString();
+
+  noteSpan.dataset.val = newNote;
+  noteSpan.innerHTML = newNote || "No notes";
+
+  amountSpan.dataset.val = newAmount;
+  const isIncome = newType === "Income";
+  amountSpan.className = `amount-text text-xl font-bold ${isIncome ? "text-green-400" : "text-red-400"}`;
+  amountSpan.innerHTML = `${isIncome ? "+" : "-"}$${newAmount.toFixed(2)}`;
+
+  typeSpan.dataset.val = newType;
+  typeSpan.innerHTML = newType;
+
+  // Change button back to Edit
+  button.classList.remove("save-btn");
+  button.classList.add("edit-btn");
+  button.innerHTML = `<span class="material-symbols-outlined">edit</span>`;
+
+  const cancelBtn = row.querySelector(".cancel-btn");
+  if (cancelBtn) cancelBtn.remove();
+}
+
+function cancelEdit(cancelBtn) {
+  const row = cancelBtn.closest(".row-container");
+
+  // Target all 5 spans
+  const catSpan = row.querySelector(".category-text");
+  const dateSpan = row.querySelector(".date-text");
+  const noteSpan = row.querySelector(".note-text");
+  const amountSpan = row.querySelector(".amount-text");
+  const typeSpan = row.querySelector(".type-text");
+
+  // Restore the original HTML using our hidden data-val attributes
+  catSpan.innerHTML = catSpan.dataset.val;
+  dateSpan.innerHTML = new Date(
+    dateSpan.dataset.val + "T12:00:00Z",
+  ).toLocaleDateString();
+  noteSpan.innerHTML = noteSpan.dataset.val || "No notes";
+
+  const amount = parseFloat(amountSpan.dataset.val);
+  const type = typeSpan.dataset.val;
+  const isIncome = type === "Income";
+
+  amountSpan.innerHTML = `${isIncome ? "+" : "-"}$${amount.toFixed(2)}`;
+  typeSpan.innerHTML = type;
+
+  const saveBtn = row.querySelector(".save-btn");
+  saveBtn.classList.remove("save-btn");
+  saveBtn.classList.add("edit-btn");
+  saveBtn.innerHTML = `<span class="material-symbols-outlined">edit</span>`;
+
+  // Delete the Cancel button from the screen
+  cancelBtn.remove();
 }
 
 const deleteModal = document.getElementById("doubleCheck");
@@ -60,85 +217,16 @@ let deleteId = null;
 let deleteRow = null;
 
 document.addEventListener("click", async (e) => {
+  // Check for Edit
   const editBtn = e.target.closest(".edit-btn");
   if (editBtn) {
-    const row = editBtn.closest(".row-container");
-    const categorySpan = row.querySelector(".category-text");
-
-    const currentCategory = categorySpan.innerText.trim();
-    categorySpan.innerHTML = `
-      <select class="category-select w-32 cursor-pointer bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all text-amber-50 p-1">
-        <option value="Food" ${currentCategory === "Food" ? "selected" : ""}>Food</option>
-        <option value="Salary" ${currentCategory === "Salary" ? "selected" : ""}>Salary</option>
-        <option value="Rent" ${currentCategory === "Rent" ? "selected" : ""}>Rent</option>
-        <option value="Utilities" ${currentCategory === "Utilities" ? "selected" : ""}>Utilities</option>
-        <option value="Savings" ${currentCategory === "Savings" ? "selected" : ""}>Savings</option>
-      </select>
-    `;
-
-    editBtn.classList.remove("edit-btn");
-    editBtn.classList.add("save-btn");
-    editBtn.innerHTML = `<span class="material-symbols-outlined text-green-400">check_circle</span>`;
+    editHistory(editBtn);
   }
 
   const saveBtn = e.target.closest(".save-btn");
   if (saveBtn) {
-    const row = saveBtn.closest(".row-container");
-    const recordId = row.dataset.id;
-    const selectDropdown = row.querySelector(".category-select");
-
-    const newCategory = selectDropdown.value;
-
-    try {
-      await pb
-        .collection("userData")
-        .update(recordId, { category: newCategory });
-      const categorySpan = row.querySelector(".category-text");
-      categorySpan.innerHTML = newCategory;
-      saveBtn.classList.remove("save-btn");
-      saveBtn.classList.add("edit-btn");
-      saveBtn.innerHTML = `<span class="material-symbols-outlined">edit</span>`;
-    } catch (error) {
-      console.error("Failed to update:", error);
-      alert("Failed to save changes. Check console for details.");
-    }
+    await saveHistory(saveBtn);
   }
-  //   if (dateSpan) {
-  //     if (dateSpan.querySelector("input")) return;
-
-  //     const row = dateSpan.closest(".row-container");
-  //     const recordId = row.dataset.id;
-  //     const originalDate = dateSpan.innerText;
-
-  //     dateSpan.innerHTML = `
-  //      <input
-  //        type="datetime-local"
-  //        id="date"
-  //        class="cursor-text w-55 px-1 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all scheme-dark"
-  //        required
-  //      />`;
-  //     const date = dateSpan.querySelector("input");
-  //     date.focus();
-
-  //     date.addEventListener("change", async () => {
-  //       try {
-  //         const newDateObj = new Date(date.value);
-  //         const newDateISO = newDateObj.toISOString();
-
-  //         dateSpan.innerHTML = newDateObj.toLocaleDateString();
-
-  //         // Update Database
-  //         await pb.collection("userData").update(recordId, { date: newDateISO });
-  //       } catch (error) {
-  //         console.error("Failed to update:", error);
-  //         // Revert on failure
-  //         dateSpan.innerHTML = originalDate;
-  //       }
-  //     });
-  //   }
-
-  //    if (noteSpan) {
-  //     if (noteSpan.querySelector("select")) return;
 
   //delete stuff
   const deleteBtn = e.target.closest(".delete-btn");
@@ -157,13 +245,17 @@ document.addEventListener("click", async (e) => {
       </div>`;
   }
 
-  // Note: Fixed the 'cancle' typo to 'cancel' here and in the HTML above!
+  const cancelBtn = e.target.closest(".cancel-btn");
+  if (cancelBtn) {
+    cancelEdit(cancelBtn);
+  }
+
   if (e.target.id === "cancel") {
     deleteModal.classList.add("hidden");
   }
 
   if (e.target.id === "delete" && deleteId) {
-    await pb.collection("userData").delete(deleteId); // Added await
+    await pb.collection("userData").delete(deleteId);
     if (deleteRow) deleteRow.remove();
     deleteModal.classList.add("hidden");
   }
