@@ -5,32 +5,41 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link href="/src/style.css" rel="stylesheet" />
+    <script src="/js/highcharts.js"></script>
     <title>finance</title>
   </head>
-  <body class="w-full h-screen bg-olive-900 text-olive-100">
+  <body class="flex flex-col w-full h-screen bg-olive-900 text-olive-100">
     <header></header>
-    <div class="flex justify-center items-center w-full h-130">
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        <div
-          class="shadow-2xl bg-olive-600 p-12 px-20 flex flex-col justify-evenly items-center rounded-2xl"
-        >
-          <h1 class="text-xl font-bold">Income</h1>
-          <h2 id="income">$0</h2>
+    <div class="flex-col flex h-full justify-start overflow-auto">
+      <div class="flex flex-col justify-center items-center w-full">
+        <div class="flex">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            <div
+              class="shadow-2xl bg-olive-600 p-12 px-20 flex flex-col justify-evenly items-center rounded-2xl"
+            >
+              <h1 class="text-xl font-bold">Income</h1>
+              <h2 id="income">$0</h2>
+            </div>
+            <div
+              class="shadow-2xl bg-olive-600 p-12 px-20 flex flex-col justify-evenly items-center rounded-2xl"
+            >
+              <h1 class="text-xl font-bold">Expense</h1>
+              <h2 id="expenses">$0</h2>
+            </div>
+            <div
+              class="shadow-2xl bg-olive-600 p-12 px-20 flex flex-col justify-evenly items-center rounded-2xl"
+            >
+              <h1 class="text-xl font-bold">Balance</h1>
+              <h2 id="balance">$0</h2>
+            </div>
+          </div>
         </div>
-        <div
-          class="shadow-2xl bg-olive-600 p-12 px-20 flex flex-col justify-evenly items-center rounded-2xl"
-        >
-          <h1 class="text-xl font-bold">Expense</h1>
-          <h2 id="expenses">$0</h2>
-        </div>
-        <div
-          class="shadow-2xl bg-olive-600 p-12 px-20 flex flex-col justify-evenly items-center rounded-2xl"
-        >
-          <h1 class="text-xl font-bold">Balance</h1>
-          <h2 id="balance">$0</h2>
+        <div class="flex">
+          <div id="graph" class="flex flex-col"></div>
         </div>
       </div>
     </div>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
