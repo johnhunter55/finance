@@ -4,3 +4,31 @@
 * {
   font-family: "Google Sans", sans-serif;
 }
+
+/* 1. Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #3f4c35 transparent; /* Olive thumb, transparent track */
+}
+
+/* 2. WebKit Scrollbar (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 8px; /* Makes the scrollbar thinner */
+  height: 8px; /* For horizontal scrollbars */
+}
+
+/* The track (background) of the scrollbar */
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* The draggable thumb */
+*::-webkit-scrollbar-thumb {
+  background-color: #3f4c35; /* Your olive-700/800 color */
+  border-radius: 10px; /* Makes it pill-shaped */
+}
+
+/* When you hover over the draggable thumb */
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #4d5c41; /* Slightly lighter olive on hover */
+}

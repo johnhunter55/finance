@@ -1,6 +1,7 @@
 import { pb, handleLogout } from "./auth.js";
 import { getTotalIncome, getTotalExpense } from "./calc.js";
 import { renderHeader } from "./header.js";
+import Highcharts from "highcharts";
 
 renderHeader();
 
@@ -20,38 +21,51 @@ const records = await pb.collection("userData").getFullList({
 function graph() {
   const categoryTotals = records.reduce((totals, record) => {
     if (record.transaction_type === "Expenses") {
-      if (!totals[record.category]) {
-        totals[record.category] = 0;
-      }
+      if (!totals[record.category]) totals[record.category] = 0;
 
-      totals[record.category] += record.amount;
+      totals[record.category] += parseFloat(record.amount);
     }
-
     return totals;
   }, {});
 
-  console.log("My Category Totals:", categoryTotals);
+  // 2. Format the data perfectly for Highcharts
+  const chartData = Object.entries(categoryTotals).map(
+    ([categoryName, totalAmount]) => {
+      return {
+        name: categoryName,
+        y: totalAmount,
+      };
+    },
+  );
 
-  const graphCon = document.getElementById("graph");
-
-  graphCon.innerHTML = Object.entries(categoryTotals)
-    .map(
-      ([category, total]) => `
-      <div class="flex justify-between items-center p-3 bg-olive-800 text-amber-50 rounded-xl mb-2 hover:bg-olive-700 transition-all shadow-md">
-        <span class="font-bold text-lg">${category}</span>
-        <span class="text-red-400 font-medium">-$${total.toFixed(2)}</span>
-      </div>
-    `,
-    )
-    .join("");
+  Highcharts.chart("expense-chart", {
+    chart: {
+      type: "pie",
+      backgroundColor: "transparent",
+    },
+    title: {
+      text: "Expenses by Category",
+      style: { color: "#fef3c7" },
+    },
+    plotOptions: {
+      pie: {
+        innerSize: "35%",
+        borderWidth: 3,
+        borderColor: "#273123",
+        dataLabels: {
+          enabled: true,
+          format: "<b>{point.name}</b>: ${point.y:.2f}",
+          color: "#fef3c7",
+        },
+      },
+    },
+    series: [
+      {
+        name: "Amount Spent",
+        data: chartData,
+      },
+    ],
+  });
 }
-
-var Highcharts = require("highcharts");
-// Load module after Highcharts is loaded
-require("highcharts/modules/exporting");
-// Create the chart
-Highcharts.chart("container", {
-  /*Highcharts options*/
-});
 
 graph();

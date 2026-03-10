@@ -16,7 +16,9 @@
   </head>
   <body class="w-full h-screen bg-olive-900 text-olive-100 flex flex-col">
     <header></header>
-    <div id="transaction-list" class="flex flex-col mt-5"></div>
+    <div class="h-full overflow-auto">
+      <div id="transaction-list" class="flex flex-col mt-5"></div>
+    </div>
     <div
       id="doubleCheck"
       class="fixed inset-0 items-center justify-center bg-black/50 z-10 hidden"
