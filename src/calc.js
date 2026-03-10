@@ -28,6 +28,6 @@ export async function getTotalExpense() {
     }, 0);
     return total;
   } catch (err) {
-    console.error("Error calculating income:", err.message);
+    console.error("Error calculating expenses:", err.message);
   }
 }

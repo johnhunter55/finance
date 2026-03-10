@@ -1,1 +1,14 @@
 Track your finanices easily, just enter in payments or bills
+
+dashboard page display total expenses income and balance
+create a chart
+have navigation
+
+form for adding transactions
+validate the inputs
+save to storage
+update dashboard upon saving
+
+fetch and display transactions from local storage
+add delete and edit
+update after changes

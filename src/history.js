@@ -1,13 +1,30 @@
 import { pb, handleLogout } from "./auth.js";
 import "material-symbols/outlined.css";
 import { renderHeader } from "./header.js";
+import { getTotalIncome, getTotalExpense } from "./calc.js";
 
 renderHeader();
 
 const currentUser = pb.authStore.record;
 const records = await pb.collection("userData").getFullList({
   sort: "-date",
+  requestKey: null,
 });
+
+async function hStats() {
+  const stats = document.getElementById("stats");
+
+  const income = await getTotalIncome();
+  const expense = await getTotalExpense();
+
+  stats.innerHTML = `
+  
+      <div><h1>Income <span class="text-green-400">$${income.toFixed(2)}</span></h1></div>
+      <div><h1>Expenses <span class="text-red-400">-$${expense.toFixed(2)}</span></h1></div>
+    `;
+}
+
+hStats();
 
 function historyList() {
   const listContainer = document.getElementById("transaction-list");
@@ -31,7 +48,7 @@ function historyList() {
             ${amountSign}$${record.amount.toFixed(2)}
           </span>
           <span class="type-text text-sm text-olive-300 mb-1" data-val="${record.transaction_type}">${record.transaction_type}</span>
-          <div id='buttons'>
+          <div>
             <button class="pt-1 text-right edit-btn text-olive-400 hover:text-white transition-all cursor-pointer">
               <span class="material-symbols-outlined">edit</span>
             </button>
@@ -226,6 +243,7 @@ document.addEventListener("click", async (e) => {
   const saveBtn = e.target.closest(".save-btn");
   if (saveBtn) {
     await saveHistory(saveBtn);
+    hStats();
   }
 
   //delete stuff
@@ -258,5 +276,6 @@ document.addEventListener("click", async (e) => {
     await pb.collection("userData").delete(deleteId);
     if (deleteRow) deleteRow.remove();
     deleteModal.classList.add("hidden");
+    hStats();
   }
 });
