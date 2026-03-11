@@ -1,4 +1,4 @@
-import { pb, handleLogout } from "./auth.js";
+import { pb } from "./auth.js";
 import { getTotalIncome, getTotalExpense } from "./calc.js";
 import { renderHeader } from "./header.js";
 import Highcharts from "highcharts";

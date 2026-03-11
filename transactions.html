@@ -16,12 +16,46 @@
   </head>
   <body class="w-full h-screen bg-olive-900 text-olive-100 flex flex-col">
     <header></header>
-    <div class="flex justify-center items-center w-full flex-1">
+    <div class="flex flex-col h-full items-center w-full flex-1">
+      <form
+        id="budget-form"
+        class="flex max-w-sm bg-olive-700 text-white items-center justify-between py-3 p-5 sm:rounded-2xl shadow-xl mb-2"
+      >
+        <label class="flex items-center gap-2 w-3/5 cursor-pointer group">
+          <div class="relative inline-flex items-center">
+            <input type="checkbox" id="budgetToggle" class="sr-only peer" />
+
+            <div
+              class="w-11 h-6 bg-olive-800 border border-olive-700 rounded-full peer peer-checked:bg-mauve-500 transition-colors duration-300 ease-in-out"
+            ></div>
+
+            <div
+              class="absolute left-0.5 top-0.5 bg-amber-50 border border-olive-600 h-5 w-5 rounded-full transition-transform duration-300 ease-in-out peer-checked:translate-x-full peer-checked:border-white"
+            ></div>
+          </div>
+          <h1
+            class="text-xl font-medium text-olive-50 group-hover:text-amber-50 transition-colors"
+          >
+            Set Budget
+          </h1>
+        </label>
+        <div class="relative w-2/5">
+          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-olive-300"
+            >$</span
+          >
+          <input
+            type="number"
+            id="budgetAmount"
+            class="w-full pl-8 pr-4 py-2 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all"
+            placeholder="0"
+          />
+        </div>
+      </form>
       <form
         id="finance-form"
-        class="flex sm:mb-40 flex-col w-full max-w-sm bg-olive-700 text-white py-6 p-10 gap-2 sm:rounded-2xl shadow-xl"
+        class="flex flex-col w-full max-w-sm bg-olive-700 text-olive-100 py-5 p-5 gap-2 sm:rounded-2xl shadow-xl"
       >
-        <h2 class="flex mb-2 justify-center text-xl font-medium text-olive-50">
+        <h2 class="flex mb-2 justify-center text-xl font-medium">
           New Transaction
         </h2>
 
@@ -33,9 +67,10 @@
           >
           <select
             id="transaction_type"
-            class="w-50 cursor-pointer px-4 py-2 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all"
+            class="w-55 cursor-pointer px-4 py-2 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all"
             required
           >
+            <option value="" disabled selected>Select type</option>
             <option value="Expenses">Expenses</option>
             <option value="Income">Income</option>
           </select>
@@ -47,14 +82,24 @@
           >
           <select
             id="category"
-            class="w-50 cursor-pointer px-4 py-2 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all"
+            class="w-55 cursor-pointer px-4 py-2 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all"
             required
           >
+            <option value="" disabled selected>Select a category</option>
             <option value="Food">Food</option>
             <option value="Salary">Salary</option>
             <option value="Rent">Rent</option>
             <option value="Utilities">Utilities</option>
             <option value="Savings">Savings</option>
+            <option value="Transportation">Transportation</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Insurance">Insurance</option>
+            <option value="Education">Education</option>
+            <option value="Debt">Debt</option>
+            <option value="Investments">Investments</option>
+            <option value="Other">Other</option>
           </select>
         </div>
 
@@ -70,7 +115,7 @@
             <input
               type="number"
               id="Amount"
-              class="w-50 pl-8 pr-4 py-2 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all"
+              class="w-55 pl-8 pr-4 py-2 bg-olive-800 rounded-xl focus:outline-none focus:ring-2 focus:ring-olive-800 focus:border-transparent transition-all"
               placeholder="0.00"
               required
             />
@@ -100,13 +145,34 @@
             placeholder="What was this for?"
           ></textarea>
         </div>
+        <div class="flex items-center mt-2">
+          <button
+            type="submit"
+            class="cursor-pointer w-1/2 py-3 bg-olive-900 hover:bg-olive-955/80 text-white font-bold rounded-xl transition-colors shadow-md active:scale-95"
+          >
+            Add Entry
+          </button>
+          <label
+            class="flex items-center gap-2 w-1/2 justify-center cursor-pointer group"
+          >
+            <div class="relative inline-flex items-center">
+              <input type="checkbox" id="recurring" class="sr-only peer" />
 
-        <button
-          type="submit"
-          class="cursor-pointer mt-4 w-full py-3 bg-olive-900 hover:bg-olive-950/80 text-white font-bold rounded-xl transition-colors shadow-md active:scale-95"
-        >
-          Add Entry
-        </button>
+              <div
+                class="w-11 h-6 bg-olive-800 border border-olive-700 rounded-full peer peer-checked:bg-mauve-500 transition-colors duration-300 ease-in-out"
+              ></div>
+
+              <div
+                class="absolute left-0.5 top-0.5 bg-amber-50 border border-olive-600 h-5 w-5 rounded-full transition-transform duration-300 ease-in-out peer-checked:translate-x-full peer-checked:border-white"
+              ></div>
+            </div>
+            <p
+              class="text-olive-100 font-medium group-hover:text-amber-50 transition-colors"
+            >
+              Recurring
+            </p>
+          </label>
+        </div>
       </form>
     </div>
     <script type="module" src="/src/input.js"></script>

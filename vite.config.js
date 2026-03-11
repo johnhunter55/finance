@@ -6,7 +6,6 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        // Just use the relative file names directly
         main: "index.html",
         dashboard: "dashboard.html",
         transactions: "transactions.html",

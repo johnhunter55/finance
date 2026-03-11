@@ -93,6 +93,15 @@ function editHistory(button) {
       <option value="Rent" ${cat === "Rent" ? "selected" : ""}>Rent</option>
       <option value="Utilities" ${cat === "Utilities" ? "selected" : ""}>Utilities</option>
       <option value="Savings" ${cat === "Savings" ? "selected" : ""}>Savings</option>
+      <option value="Transportation" ${cat === "Transportation" ? "selected" : ""}>Transportation</option>
+      <option value="Entertainment" ${cat === "Entertainment" ? "selected" : ""}>Entertainment</option>
+      <option value="Healthcare" ${cat === "Healthcare" ? "selected" : ""}>Healthcare</option>
+      <option value="Shopping" ${cat === "Shopping" ? "selected" : ""}>Shopping</option>
+      <option value="Insurance" ${cat === "Insurance" ? "selected" : ""}>Insurance</option>
+      <option value="Education" ${cat === "Education" ? "selected" : ""}>Education</option>
+      <option value="Debt" ${cat === "Debt" ? "selected" : ""}>Debt</option>
+      <option value="Investments" ${cat === "Investments" ? "selected" : ""}>Investments</option>
+      <option value="Other" ${cat === "Other" ? "selected" : ""}>Other</option>
     </select>`;
 
   dateSpan.innerHTML = `<input type="date" class="edit-date bg-olive-800 rounded px-1 focus:outline-none text-amber-50" value="${date}">`;
@@ -110,7 +119,7 @@ function editHistory(button) {
   button.classList.add("save-btn");
   button.innerHTML = `<span class="material-symbols-outlined text-green-400">check_circle</span>`;
 
-  // Inject a Cancel button right next to the Save button
+  // Cancel button right next to the Save button
   button.insertAdjacentHTML(
     "afterend",
     `
