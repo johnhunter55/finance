@@ -266,8 +266,8 @@ document.addEventListener("click", async (e) => {
       <div class='bg-olive-800 p-10 rounded-xl shadow-2xl'>
         <h1 class='mb-8 font-bold text-lg text-amber-50'>Are you sure? This will permanently delete the entry.</h1>
         <div class='flex items-center'>
-          <button id='cancel' class='cursor-pointer hover:bg-mist-950/80 hover:shadow-2xl p-2 px-4 bg-mist-900 rounded-2xl mr-5 text-amber-50'>Cancel</button>
-          <button id='delete' class='cursor-pointer text-red-500 hover:text-red-800 text-lg font-medium'>Delete</button>
+          <button id='cancel' class='cursor-pointer hover:bg-olive-950/80 hover:shadow-2xl p-2 px-4 bg-olive-900 rounded-2xl mr-5 text-amber-50'>Cancel</button>
+          <button id='delete' class='cursor-pointer  text-red-400 hover:text-red-100 text-lg font-medium'>Delete</button>
         </div>
       </div>`;
   }

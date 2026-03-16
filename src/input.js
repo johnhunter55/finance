@@ -1,9 +1,10 @@
 import { pb } from "./auth.js";
 import Toastify from "toastify-js";
 import { renderHeader } from "./header.js";
-import { getMonthlyData } from "./calc.js";
+import { getMonthlyData, syncRecurringTransactions } from "./calc.js";
 
 renderHeader();
+syncRecurringTransactions();
 
 const budgetInput = document.getElementById("budgetAmount");
 const budgetToggle = document.getElementById("budgetToggle");
@@ -82,22 +83,29 @@ document.getElementById("notes").addEventListener("keydown", (e) => {
 financeForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const inputAmount = parseFloat(financeForm.querySelector("#Amount").value);
+  const amountValue = parseFloat(document.getElementById("Amount").value);
+  const dateValue = document.getElementById("date").value;
 
-  if (inputAmount <= 0) {
+  if (isNaN(amountValue) || amountValue <= 0) {
     Toastify({
       text: "Amount cannot be $0.00 or less!",
       duration: 3000,
       close: false,
       gravity: "top",
       position: "center",
-      style: {
-        padding: "5px 24px",
-        background: "#ef4444",
-        color: "#ffffff",
-      },
+      style: { padding: "5px 24px", background: "#ef4444", color: "#ffffff" },
     }).showToast();
+    return; // Stop here if invalid
+  }
 
+  if (!dateValue) {
+    Toastify({
+      text: "Please select a valid date!",
+      duration: 3000,
+      gravity: "top",
+      position: "center",
+      style: { padding: "5px 24px", background: "#ef4444", color: "#ffffff" },
+    }).showToast();
     return;
   }
 
@@ -106,22 +114,64 @@ financeForm.addEventListener("submit", async (e) => {
       user: pb.authStore.record.id,
       transaction_type: document.getElementById("transaction_type").value,
       category: document.getElementById("category").value,
-      amount: parseFloat(document.getElementById("transactionAmount").value),
-      date: new Date(document.getElementById("date").value).toISOString(),
+      amount: amountValue,
+      date: new Date(dateValue).toISOString(),
       notes: document.getElementById("notes").value,
       recurring: document.getElementById("recurring").checked,
     };
 
-    const record = await pb.collection("userData").create(data);
+    await pb.collection("userData").create(data);
+
     financeForm.reset();
 
+    const totals = await getMonthlyData();
+
+    if (
+      totals &&
+      totals.budgetLimit > 0 &&
+      data.transaction_type === "Expenses"
+    ) {
+      const { monthlySpent, budgetLimit } = totals;
+      const percentageSpent = (monthlySpent / budgetLimit) * 100;
+
+      if (monthlySpent > budgetLimit) {
+        Toastify({
+          text: `🚨 Over Budget! You are $${(monthlySpent - budgetLimit).toFixed(2)} over your limit.`,
+          duration: 5000,
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "#dc2626",
+            color: "#ffffff",
+            padding: "12px 24px",
+            borderRadius: "8px",
+          },
+        }).showToast();
+        return;
+      } else if (percentageSpent >= 85) {
+        Toastify({
+          text: `⚠️ Heads up: You've used ${percentageSpent.toFixed(0)}% of your monthly budget.`,
+          duration: 5000,
+          gravity: "top",
+          position: "center",
+          style: {
+            background: "#f97316",
+            color: "#ffffff",
+            padding: "12px 24px",
+            borderRadius: "8px",
+          },
+        }).showToast();
+        return;
+      }
+    }
+
+    // 8. Normal Success Message
     Toastify({
       text: "Success! Record created.",
       duration: 3000,
       close: false,
       gravity: "top",
       position: "center",
-      stopOnFocus: true,
       style: {
         padding: "5px 24px",
         color: "#fffbeb",
@@ -130,10 +180,19 @@ financeForm.addEventListener("submit", async (e) => {
       },
     }).showToast();
   } catch (err) {
-    console.error("Error creating record:", err.message);
-    console.error(
-      "Validation Details:",
-      JSON.stringify(err.response?.data, null, 2),
-    );
+    console.error("Error creating record:", err);
+    // Show a popup if the database fails so you don't have to check the console
+    Toastify({
+      text: `Error: ${err.message || "Failed to save to database."}`,
+      duration: 4000,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "#ef4444",
+        color: "#ffffff",
+        padding: "12px 24px",
+        borderRadius: "8px",
+      },
+    }).showToast();
   }
 });
